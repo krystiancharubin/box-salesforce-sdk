@@ -4,8 +4,8 @@
 
 public class BoxGroup extends BoxCollaborator {
 
-    private static final String CREATE_GROUP_URL = '/groups';
-    private static final String GROUP_INFO_URL = '/groups/{0}';
+    private static final String CREATE_GROUP_URL = 'groups';
+    private static final String GROUP_INFO_URL = 'groups/{0}';
 
     /**
      * Constructs a BoxGroup for a group with a given ID.
