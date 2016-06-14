@@ -6,6 +6,8 @@ public class BoxGroup extends BoxCollaborator {
 
     private static final String CREATE_GROUP_URL = 'groups';
     private static final String GROUP_INFO_URL = 'groups/{0}';
+    private static final String ADD_MEMBERSHIP_URL_TEMPLATE = 'group_memberships';
+
 
     /**
      * Constructs a BoxGroup for a group with a given ID.
@@ -79,6 +81,42 @@ public class BoxGroup extends BoxCollaborator {
         HttpResponse response = request.send();
         String responseBody = BoxApiRequest.getBoxResourceResponseBody(response, 'BoxGroup.getGroup');
         return new BoxGroup.Info(responseBody);
+    }
+
+    /**
+     * Adds a member to this group with the default role.
+     * @param  user the member to be added to this group.
+     * @return      info about the new group membership.
+     */
+    public BoxGroupMembership.Info addMembership(BoxUser.Info user) {
+      return this.addMembership(user, null);
+    }
+
+    /**
+     * Adds a member to this group with the specified role.
+     * @param  user the member to be added to this group.
+     * @param  role the role of the user in this group. Can be null to assign the default role.
+     * @return      info about the new group membership.
+     */
+    public BoxGroupMembership.Info addMembership(BoxUser.Info user, BoxGroupMembership.Role role) {
+      BoxApiRequest request = new BoxApiRequest(api, api.baseUrl + ADD_MEMBERSHIP_URL_TEMPLATE, BoxApiRequest.METHOD_POST);
+
+      BoxUser.Info userInfo = new BoxUser.Info();
+      userInfo.addValue('id', user.getId());
+      BoxGroup.Info groupInfo = new BoxGroup.Info();
+      groupInfo.addValue('id', this.getId());
+
+      BoxGenericJsonObject params = new BoxGenericJsonObject();
+      params.addValue('user', userInfo.getJsonString());
+      params.addValue('group', groupInfo.getJsonString());
+      if (role != null) {
+       params.addValue('role', BoxGroupMembership.getRoleAsString(role));
+      }
+
+      request.setBody(params.getJsonString());
+      HttpResponse response = request.send();
+      String responseBody = BoxApiRequest.getBoxResourceResponseBody(response, 'BoxGroup.addMembership');
+      return new BoxGroupMembership.Info(responseBody);
     }
 
     /**
